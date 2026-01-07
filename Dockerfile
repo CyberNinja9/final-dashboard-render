@@ -1,7 +1,9 @@
 FROM php:8.2-apache
 
-RUN docker-php-ext-install mysqli
-RUN apt-get update && apt-get install -y curl
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    curl
+
+RUN docker-php-ext-install pdo pdo_pgsql mysqli
 
 COPY . /var/www/html/
-
