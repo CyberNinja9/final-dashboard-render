@@ -15,6 +15,7 @@
 
   <div class="row g-4">
 
+    <!-- Products by Category -->
     <div class="col-md-6">
       <div class="card p-3">
         <h5 class="text-center">Products by Category</h5>
@@ -22,6 +23,7 @@
       </div>
     </div>
 
+    <!-- Product Prices -->
     <div class="col-md-6">
       <div class="card p-3">
         <h5 class="text-center">Product Prices</h5>
@@ -29,6 +31,7 @@
       </div>
     </div>
 
+    <!-- Transactions by Response -->
     <div class="col-md-6">
       <div class="card p-3">
         <h5 class="text-center">Transactions by Response Code</h5>
@@ -36,6 +39,7 @@
       </div>
     </div>
 
+    <!-- Transaction Amounts -->
     <div class="col-md-6">
       <div class="card p-3">
         <h5 class="text-center">Transaction Amounts</h5>
@@ -43,6 +47,7 @@
       </div>
     </div>
 
+    <!-- USD -->
     <div class="col-md-6">
       <div class="card p-3">
         <h5 class="text-center">USD Exchange Rate (Last 20 Days)</h5>
@@ -50,6 +55,7 @@
       </div>
     </div>
 
+    <!-- CHF -->
     <div class="col-md-6">
       <div class="card p-3">
         <h5 class="text-center">CHF Exchange Rate (Last 20 Days)</h5>
@@ -61,30 +67,30 @@
 </div>
 
 <script>
-// ✅ HARD-CODED DATA (LIKE YOUR FRIEND)
+/* ================= STATIC DEMO DATA ================= */
 
-// Products by category
+// Products
 const productsByCategory = [
   { category: "Electronics", total: 120 },
   { category: "Furniture", total: 80 },
   { category: "Kitchen", total: 60 }
 ];
 
-// Product prices
+// Prices
 const productPrices = [
   { name: "Laptop", price: 1200 },
   { name: "Office Chair", price: 180 },
   { name: "Coffee Mug", price: 25 }
 ];
 
-// Transactions by response
+// Transactions
 const transactionsByResp = [
   { response_code: 200, total: 40 },
   { response_code: 400, total: 20 },
   { response_code: 500, total: 10 }
 ];
 
-// Transaction amounts
+// Amounts
 const transactionsAmount = [
   { order_id: 1, amount: 120 },
   { order_id: 2, amount: 240 },
@@ -92,22 +98,7 @@ const transactionsAmount = [
   { order_id: 4, amount: 320 }
 ];
 
-// USD & CHF (NBP data – static but valid)
-const usdRates = {
-  rates: [
-    { effectiveDate: "2026-01-02", mid: 3.5963 },
-    { effectiveDate: "2026-01-05", mid: 3.6045 }
-  ]
-};
-
-const chfRates = {
-  rates: [
-    { effectiveDate: "2026-01-02", mid: 4.5314 },
-    { effectiveDate: "2026-01-05", mid: 4.5263 }
-  ]
-};
-
-// ✅ DRAW CHARTS
+/* ================= DRAW STATIC CHARTS ================= */
 
 Plotly.newPlot("chart_category", [{
   labels: productsByCategory.map(i => i.category),
@@ -133,19 +124,46 @@ Plotly.newPlot("chart_amounts", [{
   type: "bar"
 }]);
 
-Plotly.newPlot("chart_usd", [{
-  x: usdRates.rates.map(r => r.effectiveDate),
-  y: usdRates.rates.map(r => r.mid),
-  type: "scatter",
-  mode: "lines+markers"
-}]);
+/* ================= LIVE NBP DATA (LIKE YOUR FRIEND) ================= */
 
-Plotly.newPlot("chart_chf", [{
-  x: chfRates.rates.map(r => r.effectiveDate),
-  y: chfRates.rates.map(r => r.mid),
-  type: "scatter",
-  mode: "lines+markers"
-}]);
+async function drawCurrencyCharts() {
+
+  // USD
+  const usdRes = await fetch(
+    "https://api.nbp.pl/api/exchangerates/rates/a/usd/last/20/?format=json"
+  );
+  const usd = await usdRes.json();
+
+  // CHF
+  const chfRes = await fetch(
+    "https://api.nbp.pl/api/exchangerates/rates/a/chf/last/20/?format=json"
+  );
+  const chf = await chfRes.json();
+
+  Plotly.newPlot("chart_usd", [{
+    x: usd.rates.map(r => r.effectiveDate),
+    y: usd.rates.map(r => r.mid),
+    mode: "lines+markers",
+    line: { width: 3 }
+  }], {
+    margin: { t: 30 },
+    xaxis: { title: "Date" },
+    yaxis: { title: "PLN" }
+  });
+
+  Plotly.newPlot("chart_chf", [{
+    x: chf.rates.map(r => r.effectiveDate),
+    y: chf.rates.map(r => r.mid),
+    mode: "lines+markers",
+    line: { width: 3 }
+  }], {
+    margin: { t: 30 },
+    xaxis: { title: "Date" },
+    yaxis: { title: "PLN" }
+  });
+}
+
+drawCurrencyCharts();
 </script>
 
 </body>
