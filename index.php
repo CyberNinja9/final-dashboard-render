@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+u modifeid correctly right ? <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -8,129 +8,184 @@
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 <style>
-body { background:#f5f7fb; }
-.card {
-  border-radius:16px;
-  border:none;
-  box-shadow:0 10px 25px rgba(0,0,0,.08);
+body {
+  background: #f5f7fb;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
 }
-.chart { height:300px; }
+
+h2 {
+  font-weight: 700;
+}
+
+.card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,.06);
+}
+
+.card h5 {
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.chart-box {
+  height: 300px;
+}
 </style>
 </head>
 
 <body>
+
 <div class="container py-5">
-<h2 class="text-center mb-5">Analytics Dashboard</h2>
+  <div class="text-center mb-5">
+    <h2>Analytics Dashboard</h2>
+    <p class="text-muted">PHP • Plotly • NBP API • Render</p>
+  </div>
 
-<div class="row g-4">
+  <div class="row g-4">
 
-<div class="col-md-6"><div class="card p-4">
-<h5>Products by Category</h5>
-<div id="cat" class="chart"></div>
-</div></div>
+    <div class="col-lg-6">
+      <div class="card p-4">
+        <h5>Products by Category</h5>
+        <div id="chart_category" class="chart-box"></div>
+      </div>
+    </div>
 
-<div class="col-md-6"><div class="card p-4">
-<h5>Product Prices</h5>
-<div id="prices" class="chart"></div>
-</div></div>
+    <div class="col-lg-6">
+      <div class="card p-4">
+        <h5>Product Prices</h5>
+        <div id="chart_prices" class="chart-box"></div>
+      </div>
+    </div>
 
-<div class="col-md-6"><div class="card p-4">
-<h5>Transactions by Response Code</h5>
-<div id="resp" class="chart"></div>
-</div></div>
+    <div class="col-lg-6">
+      <div class="card p-4">
+        <h5>Transactions by Response Code</h5>
+        <div id="chart_response" class="chart-box"></div>
+      </div>
+    </div>
 
-<div class="col-md-6"><div class="card p-4">
-<h5>Transaction Amounts</h5>
-<div id="amounts" class="chart"></div>
-</div></div>
+    <div class="col-lg-6">
+      <div class="card p-4">
+        <h5>Transaction Amounts</h5>
+        <div id="chart_amounts" class="chart-box"></div>
+      </div>
+    </div>
 
-<div class="col-md-6"><div class="card p-4">
-<h5>USD → PLN (last 20 days)</h5>
-<div id="usd" class="chart"></div>
-</div></div>
+    <div class="col-lg-6">
+      <div class="card p-4">
+        <h5>USD → PLN (last 20 days)</h5>
+        <div id="chart_usd" class="chart-box"></div>
+      </div>
+    </div>
 
-<div class="col-md-6"><div class="card p-4">
-<h5>CHF → PLN (last 20 days)</h5>
-<div id="chf" class="chart"></div>
-</div></div>
+    <div class="col-lg-6">
+      <div class="card p-4">
+        <h5>CHF → PLN (last 20 days)</h5>
+        <div id="chart_chf" class="chart-box"></div>
+      </div>
+    </div>
 
-</div>
+  </div>
 </div>
 
 <script>
-// STATIC APIs (yours)
-const products = [
- {category:"Electronics",total:120},
- {category:"Furniture",total:80},
- {category:"Kitchen",total:60}
+/* ===== STATIC DATA ===== */
+
+const productsByCategory = [
+  { category: "Electronics", total: 120 },
+  { category: "Furniture", total: 80 },
+  { category: "Kitchen", total: 60 }
 ];
 
-const prices = [
- {name:"Laptop",price:1200},
- {name:"Office Chair",price:180},
- {name:"Coffee Mug",price:25}
+const productPrices = [
+  { name: "Laptop", price: 1200 },
+  { name: "Office Chair", price: 180 },
+  { name: "Coffee Mug", price: 25 }
 ];
 
-const resp = [
- {response_code:200,total:40},
- {response_code:400,total:20},
- {response_code:500,total:10}
+const transactionsByResp = [
+  { response_code: 200, total: 40 },
+  { response_code: 400, total: 20 },
+  { response_code: 500, total: 10 }
 ];
 
-const amounts = [
- {order_id:1,amount:120},
- {order_id:2,amount:240},
- {order_id:3,amount:180},
- {order_id:4,amount:320}
+const transactionsAmount = [
+  { order_id: 1, amount: 120 },
+  { order_id: 2, amount: 240 },
+  { order_id: 3, amount: 180 },
+  { order_id: 4, amount: 320 }
 ];
 
-// Charts
-Plotly.newPlot("cat",[{
- labels:products.map(x=>x.category),
- values:products.map(x=>x.total),
- type:"pie",
- hole:.4
-}]);
+const layoutBase = {
+  paper_bgcolor: "transparent",
+  plot_bgcolor: "transparent",
+  margin: { t: 30, l: 40, r: 20, b: 40 }
+};
 
-Plotly.newPlot("prices",[{
- x:prices.map(x=>x.name),
- y:prices.map(x=>x.price),
- type:"bar"
-}]);
+const config = {
+  displayModeBar: false,
+  responsive: true
+};
 
-Plotly.newPlot("resp",[{
- labels:resp.map(x=>"Code "+x.response_code),
- values:resp.map(x=>x.total),
- type:"pie",
- hole:.4
-}]);
+/* ===== CHARTS ===== */
 
-Plotly.newPlot("amounts",[{
- x:amounts.map(x=>x.order_id),
- y:amounts.map(x=>x.amount),
- type:"bar"
-}]);
+Plotly.newPlot("chart_category", [{
+  labels: productsByCategory.map(i => i.category),
+  values: productsByCategory.map(i => i.total),
+  type: "pie",
+  hole: .45
+}], layoutBase, config);
 
-// NBP live
-fetch("https://api.nbp.pl/api/exchangerates/rates/a/usd/last/20/?format=json")
-.then(r=>r.json())
-.then(d=>{
- Plotly.newPlot("usd",[{
-  x:d.rates.map(r=>r.effectiveDate),
-  y:d.rates.map(r=>r.mid),
-  mode:"lines+markers"
- }]);
-});
+Plotly.newPlot("chart_prices", [{
+  x: productPrices.map(i => i.name),
+  y: productPrices.map(i => i.price),
+  type: "bar",
+  marker: { color: "#3b82f6" }
+}], layoutBase, config);
 
-fetch("https://api.nbp.pl/api/exchangerates/rates/a/chf/last/20/?format=json")
-.then(r=>r.json())
-.then(d=>{
- Plotly.newPlot("chf",[{
-  x:d.rates.map(r=>r.effectiveDate),
-  y:d.rates.map(r=>r.mid),
-  mode:"lines+markers"
- }]);
-});
+Plotly.newPlot("chart_response", [{
+  labels: transactionsByResp.map(i => "Code " + i.response_code),
+  values: transactionsByResp.map(i => i.total),
+  type: "pie",
+  hole: .45
+}], layoutBase, config);
+
+Plotly.newPlot("chart_amounts", [{
+  x: transactionsAmount.map(i => i.order_id),
+  y: transactionsAmount.map(i => i.amount),
+  type: "bar",
+  marker: { color: "#22c55e" }
+}], layoutBase, config);
+
+/* ===== LIVE NBP ===== */
+
+async function drawCurrencyCharts() {
+  const usd = await (await fetch(
+    "https://api.nbp.pl/api/exchangerates/rates/a/usd/last/20/?format=json"
+  )).json();
+
+  const chf = await (await fetch(
+    "https://api.nbp.pl/api/exchangerates/rates/a/chf/last/20/?format=json"
+  )).json();
+
+  Plotly.newPlot("chart_usd", [{
+    x: usd.rates.map(r => r.effectiveDate),
+    y: usd.rates.map(r => r.mid),
+    mode: "lines+markers",
+    line: { width: 3, color: "#2563eb" }
+  }], layoutBase, config);
+
+  Plotly.newPlot("chart_chf", [{
+    x: chf.rates.map(r => r.effectiveDate),
+    y: chf.rates.map(r => r.mid),
+    mode: "lines+markers",
+    line: { width: 3, color: "#16a34a" }
+  }], layoutBase, config);
+}
+
+drawCurrencyCharts();
 </script>
+
 </body>
 </html>
