@@ -14,7 +14,7 @@
 
 <style>
 body {
-  background: #f5f7fb;
+  background: linear-gradient(180deg, #f5f7fb 0%, #eef1f7 100%);
   font-family: system-ui, -apple-system, BlinkMacSystemFont;
 }
 
@@ -24,17 +24,17 @@ h2 {
 
 .card {
   border: none;
-  border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0,0,0,.06);
+  border-radius: 18px;
+  box-shadow: 0 12px 28px rgba(0,0,0,.07);
 }
 
 .card h5 {
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .chart-box {
-  height: 420px; /* increased height */
+  height: 440px; /* large, readable charts */
 }
 </style>
 </head>
@@ -44,7 +44,8 @@ h2 {
 <div class="container py-5">
   <div class="text-center mb-5">
     <h2>Analytics Dashboard</h2>
-    <p class="text-muted">PHP • Plotly • NBP API • Render</p>
+    <p class="text-muted mb-1">Plotly • NBP Public API</p>
+    <p class="text-muted small">Mirzayusif Mirzayev — 68843</p>
   </div>
 
   <div class="row g-4 justify-content-center">
@@ -72,7 +73,9 @@ h2 {
 const layoutBase = {
   paper_bgcolor: "transparent",
   plot_bgcolor: "transparent",
-  margin: { t: 30, l: 50, r: 30, b: 50 }
+  margin: { t: 30, l: 55, r: 30, b: 55 },
+  xaxis: { tickfont: { size: 11 } },
+  yaxis: { tickfont: { size: 11 } }
 };
 
 const config = {
@@ -93,14 +96,16 @@ async function drawCurrencyCharts() {
     x: usd.rates.map(r => r.effectiveDate),
     y: usd.rates.map(r => r.mid),
     mode: "lines+markers",
-    line: { width: 3, color: "#2563eb" }
+    line: { width: 3, color: "#2563eb" },
+    marker: { size: 6 }
   }], layoutBase, config);
 
   Plotly.newPlot("chart_chf", [{
     x: chf.rates.map(r => r.effectiveDate),
     y: chf.rates.map(r => r.mid),
     mode: "lines+markers",
-    line: { width: 3, color: "#16a34a" }
+    line: { width: 3, color: "#16a34a" },
+    marker: { size: 6 }
   }], layoutBase, config);
 }
 
