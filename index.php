@@ -1,10 +1,15 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Analytics Dashboard</title>
 
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Bootstrap -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Plotly -->
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 <style>
@@ -25,11 +30,11 @@ h2 {
 
 .card h5 {
   font-weight: 600;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .chart-box {
-  height: 300px;
+  height: 420px; /* increased height */
 }
 </style>
 </head>
@@ -42,44 +47,18 @@ h2 {
     <p class="text-muted">PHP • Plotly • NBP API • Render</p>
   </div>
 
-  <div class="row g-4">
+  <div class="row g-4 justify-content-center">
 
-    <div class="col-lg-6">
-      <div class="card p-4">
-        <h5>Products by Category</h5>
-        <div id="chart_category" class="chart-box"></div>
-      </div>
-    </div>
-
-    <div class="col-lg-6">
-      <div class="card p-4">
-        <h5>Product Prices</h5>
-        <div id="chart_prices" class="chart-box"></div>
-      </div>
-    </div>
-
-    <div class="col-lg-6">
-      <div class="card p-4">
-        <h5>Transactions by Response Code</h5>
-        <div id="chart_response" class="chart-box"></div>
-      </div>
-    </div>
-
-    <div class="col-lg-6">
-      <div class="card p-4">
-        <h5>Transaction Amounts</h5>
-        <div id="chart_amounts" class="chart-box"></div>
-      </div>
-    </div>
-
-    <div class="col-lg-6">
+    <!-- USD -->
+    <div class="col-lg-10">
       <div class="card p-4">
         <h5>USD → PLN (last 20 days)</h5>
         <div id="chart_usd" class="chart-box"></div>
       </div>
     </div>
 
-    <div class="col-lg-6">
+    <!-- CHF -->
+    <div class="col-lg-10">
       <div class="card p-4">
         <h5>CHF → PLN (last 20 days)</h5>
         <div id="chart_chf" class="chart-box"></div>
@@ -90,75 +69,16 @@ h2 {
 </div>
 
 <script>
-/* ===== STATIC DATA ===== */
-
-const productsByCategory = [
-  { category: "Electronics", total: 120 },
-  { category: "Furniture", total: 80 },
-  { category: "Kitchen", total: 60 }
-];
-
-const productPrices = [
-  { name: "Laptop", price: 1200 },
-  { name: "Office Chair", price: 180 },
-  { name: "Coffee Mug", price: 25 }
-];
-
-const transactionsByResp = [
-  { response_code: 200, total: 40 },
-  { response_code: 400, total: 20 },
-  { response_code: 500, total: 10 }
-];
-
-const transactionsAmount = [
-  { order_id: 1, amount: 120 },
-  { order_id: 2, amount: 240 },
-  { order_id: 3, amount: 180 },
-  { order_id: 4, amount: 320 }
-];
-
 const layoutBase = {
   paper_bgcolor: "transparent",
   plot_bgcolor: "transparent",
-  margin: { t: 30, l: 40, r: 20, b: 40 }
+  margin: { t: 30, l: 50, r: 30, b: 50 }
 };
 
 const config = {
   displayModeBar: false,
   responsive: true
 };
-
-/* ===== CHARTS ===== */
-
-Plotly.newPlot("chart_category", [{
-  labels: productsByCategory.map(i => i.category),
-  values: productsByCategory.map(i => i.total),
-  type: "pie",
-  hole: .45
-}], layoutBase, config);
-
-Plotly.newPlot("chart_prices", [{
-  x: productPrices.map(i => i.name),
-  y: productPrices.map(i => i.price),
-  type: "bar",
-  marker: { color: "#3b82f6" }
-}], layoutBase, config);
-
-Plotly.newPlot("chart_response", [{
-  labels: transactionsByResp.map(i => "Code " + i.response_code),
-  values: transactionsByResp.map(i => i.total),
-  type: "pie",
-  hole: .45
-}], layoutBase, config);
-
-Plotly.newPlot("chart_amounts", [{
-  x: transactionsAmount.map(i => i.order_id),
-  y: transactionsAmount.map(i => i.amount),
-  type: "bar",
-  marker: { color: "#22c55e" }
-}], layoutBase, config);
-
-/* ===== LIVE NBP ===== */
 
 async function drawCurrencyCharts() {
   const usd = await (await fetch(
